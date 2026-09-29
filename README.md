@@ -162,3 +162,15 @@ This project is licensed under the [Creative Commons Attribution-NonCommercial 4
 You are free to use, modify, and share the code and content for non-commercial purposes, provided that you clearly cite the source and provide attribution to the original author.
 
 If you use this work in your research, project, or publication, please include a link or reference back to this repository.
+
+
+
+## Acknowledgments & Upstream Attribution
+
+Special thanks to [QuantML-Research/wq-alpha-research](https://github.com/QuantML-Research/wq-alpha-research) for the foundational WorldQuant BRAIN field schemas, data mappings, and baseline research playbook (`SKILL.md`). 
+
+This extended framework builds an autonomous, closed-loop quantitative agent on top of their core references:
+- **Autonomous Synthesis**: Integrates Gemini Flash for intelligent factor generation.
+- **Type-Harmonization**: Automatically sanitizes `EVENT` and `VECTOR` data feeds into continuous FastExpr matrices.
+- **Pre-Submission Orthogonality Checks**: Filters out correlated signals ($r \ge 0.70$) against live portfolio daily PnL before submitting.
+- **Turnover & Decay Guardrails**: Programmatically clamps turnover to meet strict BRAIN acceptance thresholds.
