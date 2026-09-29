@@ -44,9 +44,17 @@ if not gemini_api_key:
 
 client = genai.Client(api_key=gemini_api_key)
 
-# 3. Telegram Bot Configuration
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or "8988607257:AAHpWC7Ta_njrJdShXsdiUoyl6TaajcunqY"
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or "5551315625"
+# 3. Telegram Bot Configuration (reads from gitignored telegram_config.json)
+_cfg_file = Path("telegram_config.json")
+_tg_cfg = {}
+if _cfg_file.exists():
+    try:
+        _tg_cfg = json.loads(_cfg_file.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or _tg_cfg.get("bot_token", "")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or _tg_cfg.get("chat_id", "")
 
 # 4. Global State Tracking for Health Checks
 orchestrator_state = {

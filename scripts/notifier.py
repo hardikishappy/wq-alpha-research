@@ -1,8 +1,20 @@
 import os
 import requests
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or "8988607257:AAHpWC7Ta_njrJdShXsdiUoyl6TaajcunqY"
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or "5551315625"
+import json
+from pathlib import Path
+
+# Load credentials dynamically from the gitignored config file
+_cfg_path = Path(__file__).resolve().parent.parent / "telegram_config.json"
+_cfg = {}
+if _cfg_path.exists():
+    try:
+        _cfg = json.loads(_cfg_path.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or _cfg.get("bot_token", "")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or _cfg.get("chat_id", "")
 
 def send_telegram_alert(message: str):
     """Sends a markdown-formatted message to the designated Telegram chat."""

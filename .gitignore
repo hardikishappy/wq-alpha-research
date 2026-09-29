@@ -7,3 +7,4 @@ __pycache__/
 .env
 .venv/
 venv/
+telegram_config.json
