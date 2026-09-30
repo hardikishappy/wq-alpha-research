@@ -8,3 +8,10 @@ __pycache__/
 .venv/
 venv/
 telegram_config.json
+gemini_key.txt
+daily_sims_state.json
+timed_out_alphas.json
+*.vbs
+
+salvaged.log
+dry_run_audit.json

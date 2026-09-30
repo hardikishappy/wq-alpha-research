@@ -16,6 +16,24 @@ from google.genai import types
 MAX_DAILY_SIMULATIONS = 60          # Prevents burning daily WQ simulation quota
 POLL_INTERVAL_SECONDS = 12          # Polling backoff interval
 API_BASE = "https://api.worldquantbrain.com"
+PERSIST_FILE = Path("daily_sims_state.json")
+
+# Persistent Daily Sim Tracker
+def get_persisted_daily_sims():
+    if PERSIST_FILE.exists():
+        try:
+            data = json.loads(PERSIST_FILE.read_text(encoding="utf-8"))
+            if data.get("day") == time.gmtime().tm_yday:
+                return data.get("count", 0)
+        except Exception:
+            pass
+    return 0
+
+def save_persisted_daily_sims(count: int):
+    try:
+        PERSIST_FILE.write_text(json.dumps({"day": time.gmtime().tm_yday, "count": count}), encoding="utf-8")
+    except Exception:
+        pass
 
 # 1. BRAIN Authentication Credentials
 username = os.getenv("WQ_BRAIN_USERNAME")
@@ -44,7 +62,7 @@ if not gemini_api_key:
 
 client = genai.Client(api_key=gemini_api_key)
 
-# 3. Telegram Bot Configuration (reads from gitignored telegram_config.json)
+# 3. Telegram Bot Configuration
 _cfg_file = Path("telegram_config.json")
 _tg_cfg = {}
 if _cfg_file.exists():
@@ -53,13 +71,14 @@ if _cfg_file.exists():
     except Exception:
         pass
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or _tg_cfg.get("bot_token", "")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or _tg_cfg.get("chat_id", "")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or _tg_cfg.get("bot_token", "8988607257:AAHpWC7Ta_njrJdShXsdiUoyl6TaajcunqY")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or _tg_cfg.get("chat_id", "5551315625")
+ALLOWED_CHAT_IDS = ["5551315625", "8988607257", str(TELEGRAM_CHAT_ID)]
 
 # 4. Global State Tracking for Health Checks
 orchestrator_state = {
     "start_time": time.time(),
-    "simulations_today": 0,
+    "simulations_today": get_persisted_daily_sims(),
     "last_tested": "None yet",
     "last_result": "Pending",
     "status": "Booting up...",
@@ -89,7 +108,6 @@ def telegram_command_listener():
     poll_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates"
     send_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
 
-    # Flush old pending commands on startup
     try:
         flush_resp = requests.get(poll_url, params={"offset": -1, "timeout": 5}, timeout=10)
         if flush_resp.status_code == 200:
@@ -111,7 +129,7 @@ def telegram_command_listener():
                     chat_id = str(msg.get("chat", {}).get("id", ""))
                     text = msg.get("text", "").strip().lower()
 
-                    if chat_id == str(TELEGRAM_CHAT_ID):
+                    if chat_id in ALLOWED_CHAT_IDS:
                         if text in ("/status", "/ping", "status", "ping", "help"):
                             uptime_hours = (time.time() - orchestrator_state["start_time"]) / 3600
                             reply = (
@@ -129,7 +147,6 @@ def telegram_command_listener():
             pass
         time.sleep(2)
 
-# Start interactive Telegram listener in a background daemon thread
 threading.Thread(target=telegram_command_listener, daemon=True).start()
 
 # ==========================================
@@ -162,16 +179,13 @@ for f in fields_data:
 valid_field_names = list(valid_fields_meta.keys())
 print(f"Universal Field Pool: {len(valid_field_names)} active fields across Matrix, Vector, and Event feeds.")
 
-
 def wrap_field_for_fastexpr(field_id):
-    """Safely converts sparse event and multidimensional vector feeds into continuous daily matrices."""
     ftype = valid_fields_meta.get(field_id, "MATRIX")
     if ftype == "VECTOR":
         return f"ts_backfill(vec_avg({field_id}), 252)"
     elif ftype == "EVENT":
         return f"ts_backfill({field_id}, 252)"
     return field_id
-
 
 def authenticate_brain():
     for _ in range(5):
@@ -183,7 +197,6 @@ def authenticate_brain():
             pass
         time.sleep(4)
     return False
-
 
 def fetch_pnl(alpha_id):
     try:
@@ -210,10 +223,8 @@ def fetch_pnl(alpha_id):
     except Exception:
         return []
 
-
 def daily_returns(cum_pnl):
     return [cum_pnl[i+1] - cum_pnl[i] for i in range(len(cum_pnl) - 1)]
-
 
 def get_active_alphas():
     all_alphas = []
@@ -233,17 +244,15 @@ def get_active_alphas():
             break
     return [a for a in all_alphas if a.get("status") == "ACTIVE"]
 
-
 def generate_candidate_with_gemini(active_alpha_summaries):
-    """Prompts Gemini with verified fields, unit-safety rules, and proven SKILL.md templates."""
     sampled_keys = np.random.choice(valid_field_names, 30, replace=False).tolist()
     wrapped_field_pool = [wrap_field_for_fastexpr(k) for k in sampled_keys]
     
     prompt = f"""
 You are an elite quantitative researcher at WorldQuant BRAIN designing cross-asset alphas for USA TOP3000 delay=1.
-Goal: Produce 1 mathematically valid FastExpr expression using diverse datasets (analyst revisions, news, balance sheet, or sentiment).
+Goal: Produce 1 mathematically valid FastExpr expression using diverse datasets.
 
-### VERIFIED FIELD POOL (Ready-to-use continuous signals):
+### VERIFIED FIELD POOL:
 {wrapped_field_pool}
 
 Pricing fields available: close, open, high, low, volume, vwap, returns.
@@ -251,12 +260,11 @@ Pricing fields available: close, open, high, low, volume, vwap, returns.
 ### CRITICAL FASTEXPR SYNTAX RULES:
 1. NEVER multiply two group_rank terms together. Structure must be strictly ADDITIVE or SUBTRACTIVE:
    0.5 * group_rank(ts_rank(SIGNAL_A, 126), subindustry) - 0.5 * group_rank(ts_rank(SIGNAL_B, 20), subindustry)
-2. UNIT COMPLIANCE (unitHandling: VERIFY):
-   - NEVER add a raw scalar float (like + 0.0001 or + 0.001) to a fundamental, price, or volume field (triggers Unit[] mismatch).
-   - FastExpr handles zero-division natively via nanHandling: ON. Divide fields directly: (close / vwap - 1) or (field_A / field_B).
-   - If subtracting or combining disparate metrics, rank them FIRST to convert to dimensionless percentiles:
+2. UNIT COMPLIANCE:
+   - NEVER add a raw scalar float (+ 0.0001) to a fundamental, price, or volume field.
+   - FastExpr handles zero-division natively via nanHandling: ON. Divide fields directly: (close / vwap - 1).
+   - If combining disparate metrics, rank them FIRST:
      group_rank(ts_rank(A, 126), subindustry) - group_rank(ts_rank(B, 20), subindustry)
-3. If combining a slow fundamental or analyst signal with a price signal, subtract price momentum to capture mean-reversion.
 
 ### DO NOT CORRELATE WITH ACTIVE ALPHAS:
 {active_alpha_summaries[:4]}
@@ -266,7 +274,7 @@ Output strictly valid JSON with keys:
 "decay": integer (4 to 16),
 "neutralization": "SUBINDUSTRY"
 """
-    candidate_models = ["gemini-3.5-flash-lite", "gemini-3.8-flash"]
+    candidate_models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"]
     
     for model_name in candidate_models:
         for attempt in range(3):
@@ -288,13 +296,28 @@ Output strictly valid JSON with keys:
             except Exception as e:
                 err_str = str(e)
                 if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                    time.sleep(40)
+                    time.sleep(30)
                 elif "503" in err_str or "UNAVAILABLE" in err_str:
                     time.sleep((2 ** attempt) * 4)
                 else:
                     break
     return None
 
+TIMEOUT_QUEUE_FILE = Path("timed_out_alphas.json")
+
+def load_timeout_queue() -> list:
+    if TIMEOUT_QUEUE_FILE.exists():
+        try:
+            return json.loads(TIMEOUT_QUEUE_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            return []
+    return []
+
+def save_timeout_queue(queue_data: list):
+    try:
+        TIMEOUT_QUEUE_FILE.write_text(json.dumps(queue_data, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"[Warning] Failed to save timeout queue: {e}")
 
 def run_loop():
     if not authenticate_brain():
@@ -302,7 +325,7 @@ def run_loop():
         orchestrator_state["status"] = "Auth Failure"
         orchestrator_state["last_error"] = "BRAIN 401/Auth Failed"
         sys.exit(1)
-        
+
     print("Orchestrator online. Loading active portfolio...")
     orchestrator_state["status"] = "Syncing portfolio"
     active_alphas = get_active_alphas()
@@ -311,51 +334,126 @@ def run_loop():
         pnl = fetch_pnl(a["id"])
         if pnl:
             existing_pnls[a["id"]] = pnl
-            
+
     orchestrator_state["total_active"] = len(active_alphas)
     orchestrator_state["status"] = "Mining alphas"
     print(f"Tracking {len(active_alphas)} ACTIVE alphas in memory.")
-    
-    daily_sim_count = 0
+
+    daily_sim_count = get_persisted_daily_sims()
     last_reset_day = time.gmtime().tm_yday
     fast_pattern = re.compile(r"\b(close|open|vwap|volume|high|low|returns|adv\d+)\b", re.IGNORECASE)
-    
+
     while True:
         current_day = time.gmtime().tm_yday
         if current_day != last_reset_day:
             daily_sim_count = 0
+            save_persisted_daily_sims(0)
             last_reset_day = current_day
-            
+
         if daily_sim_count >= MAX_DAILY_SIMULATIONS:
             orchestrator_state["status"] = "Daily limit reached (sleeping)"
             print(f"[Guardrail] Daily simulation limit ({MAX_DAILY_SIMULATIONS}) reached. Sleeping 1 hour...")
             time.sleep(3600)
             continue
-            
+
+        backlog = load_timeout_queue()
+        if backlog:
+            print(f"\n[Backlog Scanner] Checking {len(backlog)} pending/timed-out simulation(s)...")
+            remaining_backlog = []
+
+            for pending in backlog:
+                p_sim_id = pending.get("sim_id")
+                p_expr = pending.get("expression")
+                p_decay = pending.get("decay", 4)
+
+                try:
+                    p_resp = session.get(f"{API_BASE}/simulations/{p_sim_id}", timeout=15)
+                    if p_resp.status_code != 200:
+                        remaining_backlog.append(pending)
+                        continue
+
+                    p_data = p_resp.json()
+                    p_status = p_data.get("status")
+
+                    if p_status == "COMPLETE":
+                        rec_alpha_id = p_data.get("alpha")
+                        print(f"\n💎 [SALVAGED] Timed-out job {p_sim_id} FINISHED on BRAIN! Alpha ID: {rec_alpha_id}")
+                        a_data = session.get(f"{API_BASE}/alphas/{rec_alpha_id}", timeout=15).json()
+                        is_m = a_data.get("is", {})
+                        r_sharpe = float(is_m.get("sharpe", 0))
+                        r_fitness = float(is_m.get("fitness", 0))
+                        r_turnover = float(is_m.get("turnover", 0))
+
+                        if r_sharpe >= 1.25 and r_fitness >= 1.0 and (0.01 <= r_turnover <= 0.20):
+                            r_pnl = fetch_pnl(rec_alpha_id)
+                            r_ret = daily_returns(r_pnl)
+                            is_correlated = False
+
+                            for old_id, old_pnl in existing_pnls.items():
+                                old_ret = daily_returns(old_pnl)
+                                if len(r_ret) == len(old_ret) and len(r_ret) > 20:
+                                    corr = abs(float(np.corrcoef(r_ret, old_ret)[0, 1]))
+                                    if corr >= 0.70:
+                                        is_correlated = True
+                                        break
+
+                            if not is_correlated:
+                                sub_r = session.post(f"{API_BASE}/alphas/{rec_alpha_id}/submit", timeout=20)
+                                if sub_r.status_code in (200, 201):
+                                    existing_pnls[rec_alpha_id] = r_pnl
+                                    active_alphas.append(a_data)
+                                    orchestrator_state["total_active"] = len(active_alphas)
+
+                                    try:
+                                        subprocess.run([sys.executable, "scripts/evolve_skill.py", "--apply"], check=False)
+                                    except Exception:
+                                        pass
+
+                                    send_telegram_alert(
+                                        f"🚀 *Salvaged Alpha Accepted!*\n\n"
+                                        f"*Alpha ID:* `{rec_alpha_id}`\n"
+                                        f"*Sharpe:* `{r_sharpe:.2f}`\n"
+                                        f"*Fitness:* `{r_fitness:.2f}`\n"
+                                        f"*Turnover:* `{r_turnover:.2%}`\n"
+                                        f"*Expression:*\n`{p_expr}`\n\n"
+                                        f"📊 *Total ACTIVE Alphas:* `{len(active_alphas)}`"
+                                    )
+                        continue
+                    elif p_status in ("ERROR", "FAILED"):
+                        continue
+                    else:
+                        remaining_backlog.append(pending)
+                except Exception:
+                    remaining_backlog.append(pending)
+
+            save_timeout_queue(remaining_backlog)
+
         orchestrator_state["status"] = "Synthesizing candidate with Gemini"
         active_summaries = [f"ID {a['id']}: {a.get('regular', '')}" for a in active_alphas[-5:]]
         candidate = generate_candidate_with_gemini(active_summaries)
         time.sleep(10)
-        
+
         if not candidate or "expression" not in candidate:
             continue
-            
+
         expr = candidate["expression"]
+        expr = re.sub(r',\s*(\d+)\.0+\b', r', \1', expr)
+        expr = re.sub(r'\s+', ' ', expr).strip()
+
         try:
             decay = int(candidate.get("decay", 4))
         except (ValueError, TypeError):
             decay = 4
 
         neutralization = candidate.get("neutralization", "SUBINDUSTRY")
-        
-        # Enforce turnover dampening if price/volume features are present
+
         if fast_pattern.search(expr) and decay < 12:
             decay = 12
-            
+
         orchestrator_state["last_tested"] = expr[:120] + "..." if len(expr) > 120 else expr
         orchestrator_state["simulations_today"] = daily_sim_count
         orchestrator_state["status"] = f"Simulating on cluster (Decay: {decay})"
-        
+
         print(f"\n--- Testing Candidate: {expr} (Decay: {decay}) ---")
         settings = {
             "instrumentType": "EQUITY", "region": "USA", "universe": "TOP3000",
@@ -363,9 +461,9 @@ def run_loop():
             "truncation": 0.08, "pasteurization": "ON", "unitHandling": "VERIFY",
             "nanHandling": "ON", "language": "FASTEXPR", "visualization": False
         }
-        
+
         payload = {"type": "REGULAR", "settings": settings, "regular": expr}
-        
+
         try:
             sim_resp = session.post(f"{API_BASE}/simulations", json=payload, timeout=25)
         except Exception as e:
@@ -373,23 +471,24 @@ def run_loop():
             print(f">> Simulation connection error: {e}")
             time.sleep(POLL_INTERVAL_SECONDS)
             continue
-            
+
         daily_sim_count += 1
         orchestrator_state["simulations_today"] = daily_sim_count
-        
+        save_persisted_daily_sims(daily_sim_count)
+
         if sim_resp.status_code == 401:
             orchestrator_state["status"] = "Session expired, re-authenticating"
             print(">> Session expired. Re-authenticating with BRAIN...")
             authenticate_brain()
             time.sleep(4)
             continue
-            
+
         if sim_resp.status_code != 201:
             orchestrator_state["last_error"] = f"HTTP {sim_resp.status_code}: {sim_resp.text[:60]}"
             print(f">> Simulation rejected by BRAIN ({sim_resp.status_code}): {sim_resp.text}")
             time.sleep(POLL_INTERVAL_SECONDS)
             continue
-            
+
         loc = sim_resp.headers.get("Location", "")
         if loc:
             sim_id = loc.rstrip("/").split("/")[-1]
@@ -403,59 +502,73 @@ def run_loop():
             orchestrator_state["last_error"] = "Failed to parse simulation ID"
             print(f">> Could not extract simulation ID from BRAIN response.")
             continue
-        
-        # Poll completion status
+
         alpha_id = None
-        for _ in range(35):
+        sim_failed = False
+
+        for poll_round in range(60):
             time.sleep(5)
             try:
                 poll_resp = session.get(f"{API_BASE}/simulations/{sim_id}", timeout=15)
                 if poll_resp.status_code != 200:
                     continue
+
                 p_data = poll_resp.json()
                 status = p_data.get("status")
-                
+
                 if status == "COMPLETE":
                     alpha_id = p_data.get("alpha")
                     break
                 elif status in ("ERROR", "FAILED"):
-                    err_msg = p_data.get('message', 'Syntax/Execution error')
+                    err_msg = p_data.get("message", "Syntax/Execution error")
                     orchestrator_state["last_error"] = err_msg[:80]
-                    print(f">> Simulation failed: {err_msg}")
+                    print(f">> Simulation failed on server: {err_msg}")
+                    sim_failed = True
                     break
             except Exception:
                 pass
-                
-        if not alpha_id:
-            orchestrator_state["last_result"] = "Simulation timed out / failed"
-            print(f">> Simulation timed out or did not return an alpha ID.")
+
+        if not alpha_id and not sim_failed:
+            orchestrator_state["last_result"] = "Cluster queue latency (Saved to backlog)"
+            print(f">> Simulation {sim_id} timed out locally. Saving candidate to timed_out_alphas.json...")
+            current_queue = load_timeout_queue()
+            current_queue.append({
+                "sim_id": sim_id,
+                "expression": expr,
+                "decay": decay,
+                "neutralization": neutralization,
+                "timestamp": time.time()
+            })
+            save_timeout_queue(current_queue)
             continue
-            
+
+        if not alpha_id:
+            orchestrator_state["last_result"] = "Simulation failed"
+            continue
+
         try:
             alpha_data = session.get(f"{API_BASE}/alphas/{alpha_id}", timeout=15).json()
         except Exception as e:
             orchestrator_state["last_error"] = f"Alpha fetch error: {str(e)[:60]}"
             continue
-            
+
         is_m = alpha_data.get("is", {})
         sharpe = float(is_m.get("sharpe", 0))
         fitness = float(is_m.get("fitness", 0))
         turnover = float(is_m.get("turnover", 0))
-        
+
         result_str = f"Sharpe: {sharpe:.2f} | Fitness: {fitness:.2f} | Turnover: {turnover:.2%}"
         orchestrator_state["last_result"] = result_str
         print(f"Results -> {result_str}")
-        
-        # In-Sample Pass Criteria Check
+
         if sharpe < 1.25 or fitness < 1.0 or turnover < 0.01 or turnover > 0.20:
             print(">> Rejected: Failed In-Sample acceptance thresholds.")
             continue
-            
-        # Daily Return Correlation Guardrail (< 0.70 threshold)
+
         new_pnl = fetch_pnl(alpha_id)
         new_ret = daily_returns(new_pnl)
         high_corr = False
-        
+
         for old_id, old_pnl in existing_pnls.items():
             old_ret = daily_returns(old_pnl)
             if len(new_ret) == len(old_ret) and len(new_ret) > 20:
@@ -467,8 +580,7 @@ def run_loop():
                     break
         if high_corr:
             continue
-            
-        # Auto-Submit the Alpha
+
         print(f">> Submitting Alpha {alpha_id} to WorldQuant BRAIN...")
         orchestrator_state["status"] = f"Submitting Alpha {alpha_id}"
         try:
@@ -476,13 +588,12 @@ def run_loop():
         except Exception as e:
             print(f">> Error submitting alpha: {e}")
             continue
-            
+
         if sub_resp.status_code not in (200, 201):
             orchestrator_state["last_error"] = f"Submit failed: HTTP {sub_resp.status_code}"
             print(f">> Submission error (Status {sub_resp.status_code}): {sub_resp.text}")
             continue
-            
-        # Confirm ACTIVE Status
+
         is_active = False
         for _ in range(25):
             time.sleep(8)
@@ -493,24 +604,22 @@ def run_loop():
                     break
             except Exception:
                 pass
-                
+
         if is_active:
             print(f"\n==========================================")
             print(f"🎉 SUCCESS! Alpha {alpha_id} is now ACTIVE!")
             print(f"==========================================\n")
-            
+
             existing_pnls[alpha_id] = new_pnl
             active_alphas.append(chk)
             total_active = len(active_alphas)
             orchestrator_state["total_active"] = total_active
-            
-            # 1. Update local skill memory
+
             try:
                 subprocess.run([sys.executable, "scripts/evolve_skill.py", "--apply"], check=False)
             except Exception as e:
                 print(f"[Warning] evolve_skill.py error: {e}")
-            
-            # 2. Dispatch Telegram Push Alert
+
             alert_msg = (
                 f"🚀 *New WorldQuant Alpha Accepted!*\n\n"
                 f"*Alpha ID:* `{alpha_id}`\n"
@@ -521,8 +630,9 @@ def run_loop():
                 f"📊 *Total ACTIVE Alphas:* `{total_active}`"
             )
             send_telegram_alert(alert_msg)
-            
+
         time.sleep(POLL_INTERVAL_SECONDS)
 
+# ==================== ENTRYPOINT ====================
 if __name__ == "__main__":
     run_loop()

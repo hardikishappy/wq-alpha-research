@@ -772,3 +772,187 @@ pyenv exec python scripts/evolve_skill.py --apply
 
 ---
 
+
+### 2026-09-29 15:09 UTC
+
+- **vR2KelW3** (ACTIVE, technical): Sharpe=1.84, Fitness=1.05, TO=0.1906, DD=0.0469。指标一般，需继续优化；与现有 ACTIVE alpha 低相关 (0.39)，分散价值较高
+  - 相关：P0gJqVKq(+0.39), rKe1mOzd(+0.12), 3qX8jGe6(+0.10)
+  - 表达式：`group_rank(ts_rank(gross_income_reported_value / est_tot_assets, 126), subindustry) - group_rank(ts_rank(close / vwap...`
+- **LLZPgX8m** (UNSUBMITTED, other): Sharpe=-1.07, Fitness=-0.45, TO=0.2956, DD=0.2654。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(vec_avg(fnd6_newqeventv110_pncwiepq), 252), 126), subindustry) - group_rank(ts_rank(im...`
+- **QPK12ZL5** (UNSUBMITTED, other): Sharpe=1.76, Fitness=0.83, TO=0.2646, DD=0.0309。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(vec_avg(anl4_adxqfv110_low), 252), 126), subindustry) - 0.5 * group_rank(ts_rank...`
+- **gJZYo0PO** (UNSUBMITTED, other): Sharpe=0.48, Fitness=0.18, TO=0.1795, DD=0.066。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fcf_number, 252) / close, 126), subindustry) - 0.5 * group_rank(ts_rank(ts_...`
+- **786kK6Zb** (UNSUBMITTED, other): Sharpe=2.51, Fitness=1.65, TO=0.2004, DD=0.0264。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(vec_avg(anl4_fs_guidance_basic_qf_v4_nd_estimate), 252), 126), subindustry) - group_ra...`
+- **mL6PxZd5** (UNSUBMITTED, sentiment): Sharpe=-0.57, Fitness=-0.24, TO=0.1931, DD=0.2225。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(scl12_sentiment_fast_d1, 20), subindustry) - group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimat...`
+- **kqgxL5z8** (UNSUBMITTED, other): Sharpe=1.33, Fitness=0.84, TO=0.216, DD=0.0584。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(vec_avg(anl4_dez1basicqfv4_est), 252) / close, 126), subindustry) - group_rank(ts_rank...`
+- **O081m3m1** (UNSUBMITTED, technical): Sharpe=-0.04, Fitness=-0.01, TO=0.1503, DD=0.2516。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(vec_avg(nws12_mainz_01l), 252), 60), subindustry) - group_rank(ts_rank(ts_decay_linear...`
+- **gJZYPz7v** (UNSUBMITTED, other): Sharpe=2.08, Fitness=1.59, TO=0.1695, DD=0.0428。满足基础提交门槛；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimate_1qf_v4_nd_ptp_mean, 252) / close, 126), subindustry) - group_r...`
+- **xAbKQpoW** (UNSUBMITTED, other): Sharpe=1.13, Fitness=0.69, TO=0.1882, DD=0.074。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimate_1qf_v4_nd_ebit_number, 252) / close, 126), subindustry) - grou...`
+- **xAbKQw5n** (UNSUBMITTED, technical): Sharpe=1.8, Fitness=1.45, TO=0.1539, DD=0.0445。满足基础提交门槛；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(anl4_qf_az_eps_mean, 252) / close, 126), subindustry) - group_rank(ts_rank(ts_decay_li...`
+
+---
+
+
+### 2026-09-29 16:16 UTC
+
+- **GrOqG8NG** (ACTIVE, other): Sharpe=1.62, Fitness=1.0, TO=0.1682, DD=0.0501。指标一般，需继续优化；与 P0gJqVKq 中等相关 (0.68)，谨慎提交
+  - 相关：P0gJqVKq(+0.68), vR2KelW3(+0.50), 3qX8jGe6(+0.32)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fcf_mean, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_line...`
+- **0mrbMNZp** (UNSUBMITTED, analyst): Sharpe=2.06, Fitness=1.48, TO=0.175, DD=0.0452。满足基础提交门槛；与 GrOqG8NG 高度相关 (0.71)，需换信号簇
+  - 相关：GrOqG8NG(+0.71), rKe1mOzd(+0.58), 3qX8jGe6(+0.58)
+  - 表达式：`group_rank(ts_rank(est_fcf / close, 126), subindustry) - group_rank(ts_rank(ts_decay_linear((close - open) / open, 5)...`
+- **kqgxZmOO** (UNSUBMITTED, other): Sharpe=1.84, Fitness=1.56, TO=0.1599, DD=0.0575。满足基础提交门槛；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(anl4_netprofita_std, 252) / (ts_backfill(vec_avg(fourteen_period_avg_true_range), 252)...`
+- **vR2Kv3Zz** (UNSUBMITTED, technical): Sharpe=1.64, Fitness=1.04, TO=0.2204, DD=0.0642。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(vec_avg(nws12_afterhsz_postvwap), 252) / close, 126), subindustry) - group_rank(ts_ran...`
+- **0mrbEZXK** (UNSUBMITTED, other): Sharpe=1.31, Fitness=0.92, TO=0.2028, DD=0.0933。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(vec_avg(anl4_fs_basic_splt_v4_nd_sales_previosestimate), 252) / close, 126), sub...`
+- **LLZP1gav** (UNSUBMITTED, analyst): Sharpe=1.74, Fitness=1.24, TO=0.1851, DD=0.0633。满足基础提交门槛；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(est_ebitda / close, 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_linear((close - o...`
+- **d512xoRv** (UNSUBMITTED, technical): Sharpe=2.23, Fitness=1.7, TO=0.1658, DD=0.0392。满足基础提交门槛；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_netprofit_median, 252) / close, 126), subindustry) - 0.5 * group_rank(ts_ra...`
+- **3qVM7W6X** (UNSUBMITTED, other): Sharpe=2.16, Fitness=1.69, TO=0.1861, DD=0.0471。满足基础提交门槛；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimates_advanced_af_nd_ptp_high, 252) / close, 126), subindustr...`
+- **58gZvgbM** (UNSUBMITTED, other): Sharpe=2.07, Fitness=1.46, TO=0.1765, DD=0.0275。满足基础提交门槛；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(anl4_fs_actual_1qf_v4_nd_fcf_value, 252) / close, 126), subindustry) - group_rank(ts_r...`
+- **E5RZk6JL** (UNSUBMITTED, other): Sharpe=1.64, Fitness=1.0, TO=0.1589, DD=0.0546。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_epsr_value, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_li...`
+- **KPrKkdNE** (UNSUBMITTED, other): Sharpe=1.51, Fitness=0.65, TO=0.3349, DD=0.0381。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(vec_avg(scl12_sentvec), 252), 126), subindustry) - group_rank(ts_rank(ts_decay_linear(...`
+- **Vk0vXRQ5** (UNSUBMITTED, other): Sharpe=0.6, Fitness=0.22, TO=0.1462, DD=0.0475。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`group_rank(ts_rank(ts_backfill(anl4_qf_az_eps_mean, 252) / close, 126), subindustry) - group_rank(ts_rank(implied_vol...`
+- **2rm1vjgx** (UNSUBMITTED, other): Sharpe=0.06, Fitness=0.01, TO=0.2957, DD=0.1341。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(vec_avg(nws12_afterhsz_5s), 252), 126), subindustry) - 0.5 * group_rank(ts_rank(...`
+- **E5RZqwx0** (UNSUBMITTED, other): Sharpe=0.68, Fitness=0.4, TO=0.0916, DD=0.0869。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(vec_avg(anl4_fs_basic_splt_v4_nd_sales_previosestimate), 252) / close, 126), sub...`
+
+---
+
+
+### 2026-09-29 16:19 UTC
+
+- **N1VXbVbo** (ACTIVE, technical): Sharpe=2.7, Fitness=2.04, TO=0.1811, DD=0.0302。满足基础提交门槛；与 3qX8jGe6 中等相关 (0.68)，谨慎提交
+  - 相关：3qX8jGe6(+0.68), rKe1mOzd(+0.61), 9qWzQLeK(+0.43)
+  - 表达式：`group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimate_1qf_v4_nd_epsr_high, 252) / close, 126), subindustry) - group_...`
+
+---
+
+
+### 2026-09-29 17:40 UTC
+
+- **O0816Lr7** (ACTIVE, technical): Sharpe=1.9, Fitness=1.31, TO=0.1573, DD=0.0682。满足基础提交门槛；与 P0gJqVKq 高度相关 (0.76)，需换信号簇
+  - 相关：P0gJqVKq(+0.76), GrOqG8NG(+0.69), vR2KelW3(+0.45)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_ptp_value, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_lin...`
+- **d5129VWJ** (UNSUBMITTED, technical): Sharpe=0.41, Fitness=0.13, TO=0.1484, DD=0.0688。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_ptp_mean, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(volume / ts_b...`
+- **QPK108Mw** (UNSUBMITTED, technical): Sharpe=-0.06, Fitness=-0.01, TO=0.1545, DD=0.1301。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimates_basic_qf_v4_nd_sales_median, 252), 126), subindustry) -...`
+- **A1vRx5Me** (UNSUBMITTED, technical): Sharpe=1.39, Fitness=0.73, TO=0.1752, DD=0.0371。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(vec_avg(nws12_prez_3l), 252), 126), subindustry) - 0.5 * group_rank(ts_rank(retu...`
+- **N1VXPN2L** (UNSUBMITTED, technical): Sharpe=1.5, Fitness=0.9, TO=0.1637, DD=0.0449。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_cfi_mean, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_line...`
+- **RR6JenMz** (UNSUBMITTED, technical): Sharpe=0.05, Fitness=0.01, TO=0.1488, DD=0.0845。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_ebitda_mean, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_l...`
+- **O081AVdg** (UNSUBMITTED, sentiment): Sharpe=1.35, Fitness=0.6, TO=0.2856, DD=0.0326。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(scl12_sentiment_fast_d1, 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_linear((clos...`
+- **xAbKrw7w** (UNSUBMITTED, technical): Sharpe=1.55, Fitness=1.01, TO=0.1587, DD=0.0685。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_netprofit_median, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_de...`
+- **j285Yv85** (UNSUBMITTED, other): Sharpe=1.02, Fitness=0.62, TO=0.1242, DD=0.087。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimate_1qf_v4_nd_epsr_mean, 252), 126), subindustry) - 0.5 * gr...`
+- **blOY8g8R** (UNSUBMITTED, technical): Sharpe=1.37, Fitness=0.79, TO=0.1649, DD=0.0406。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_cff_mean, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_line...`
+- **XgJjRaE0** (UNSUBMITTED, other): Sharpe=0.28, Fitness=0.1, TO=0.1706, DD=0.185。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_guidances_advanced_af_nd_fcfps_minguidance, 252), 126), subindustry) - 0...`
+- **zqbvrRb1** (UNSUBMITTED, technical+sentiment): Sharpe=0.97, Fitness=0.38, TO=0.3119, DD=0.051。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(vec_avg(earnings_evaluation_sentiment), 252), 126), subindustry) - 0.5 * group_r...`
+- **QPK1YrP5** (UNSUBMITTED, technical): Sharpe=-0.06, Fitness=-0.01, TO=0.1662, DD=0.1624。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimates_advanced_af_nd_fcfps_median, 252), 126), subindustry) -...`
+- **d512KpOK** (UNSUBMITTED, technical): Sharpe=1.28, Fitness=0.76, TO=0.1541, DD=0.0727。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fcf_value, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_lin...`
+- **6XKnK6a7** (UNSUBMITTED, technical): Sharpe=1.06, Fitness=0.48, TO=0.2152, DD=0.0459。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(vec_avg(nws12_prez_result2), 252), 126), subindustry) - 0.5 * group_rank(ts_rank...`
+- **gJZYZXnJ** (UNSUBMITTED, technical): Sharpe=-0.21, Fitness=-0.05, TO=0.1585, DD=0.1041。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_ebit_median, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_l...`
+- **88PmPlnV** (UNSUBMITTED, technical): Sharpe=1.55, Fitness=1.0, TO=0.1474, DD=0.0424。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_netprofita_number, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_d...`
+- **E5RZRGj9** (UNSUBMITTED, technical): Sharpe=1.31, Fitness=0.73, TO=0.1635, DD=0.0516。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimates_advanced_af_nd_cfo_mean, 252), 126), subindustry) - 0.5...`
+- **2rm1wgdP** (UNSUBMITTED, technical): Sharpe=1.28, Fitness=0.6, TO=0.2086, DD=0.0432。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(vec_avg(anl4_dez1basicqfv4_preest), 252), 126), subindustry) - 0.5 * group_rank(...`
+- **blOYbJaq** (UNSUBMITTED, technical): Sharpe=1.31, Fitness=0.83, TO=0.15, DD=0.0719。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_qfv4_median_eps, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_dec...`
+- **2rm1wl5P** (UNSUBMITTED, technical): Sharpe=1.55, Fitness=0.97, TO=0.1562, DD=0.0586。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_ebit_low, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_line...`
+- **pw5qPLzq** (UNSUBMITTED, technical): Sharpe=1.71, Fitness=1.12, TO=0.1606, DD=0.058。满足基础提交门槛；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimates_advanced_af_nd_fcf_median, 252), 126), subindustry) - 0...`
+- **RR6JV2nn** (UNSUBMITTED, technical): Sharpe=1.65, Fitness=1.06, TO=0.1609, DD=0.0531。指标一般，需继续优化；与 GrOqG8NG 高度相关 (0.81)，需换信号簇
+  - 相关：GrOqG8NG(+0.81), O0816Lr7(+0.74), P0gJqVKq(+0.66)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_cfo_mean, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_decay_line...`
+- **GrOql9X0** (UNSUBMITTED, technical): Sharpe=1.69, Fitness=1.14, TO=0.1541, DD=0.0462。满足基础提交门槛；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_median_epsreported, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_...`
+- **XgJj7Rgm** (UNSUBMITTED, technical): Sharpe=1.08, Fitness=0.62, TO=0.1521, DD=0.0799。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimate_1qf_v4_nd_ebitda_mean, 252), 126), subindustry) - 0.5 * ...`
+- **GrOqlw3x** (UNSUBMITTED, other): Sharpe=1.2, Fitness=0.7, TO=0.1648, DD=0.0609。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_gric_mean, 252), 126), subindustry) - 0.5 * group_rank(ts_rank(ts_delta(clo...`
+- **XgJj7wnz** (UNSUBMITTED, sentiment): Sharpe=0.17, Fitness=0.03, TO=0.2642, DD=0.0622。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(vec_avg(merger_acquisition_sentiment), 252), 126), subindustry) - 0.5 * group_ra...`
+- **786kzRLZ** (UNSUBMITTED, other): Sharpe=1.47, Fitness=0.87, TO=0.1563, DD=0.0264。指标一般，需继续优化；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimate_1qf_v4_nd_capex_number, 252), 126), subindustry) - 0.5 *...`
+
+---
+
+
+### 2026-09-29 18:25 UTC
+
+- **2rm1ePwb** (ACTIVE, technical): Sharpe=1.76, Fitness=1.02, TO=0.166, DD=0.0347。指标一般，需继续优化；与 O0816Lr7 中等相关 (0.56)，谨慎提交
+  - 相关：O0816Lr7(+0.56), GrOqG8NG(+0.54), P0gJqVKq(+0.45)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimates_advanced_af_nd_sh_equity_std, 252), 126), subindustry) ...`
+- **omW1radn** (UNSUBMITTED, technical): Sharpe=2.45, Fitness=1.89, TO=0.1729, DD=0.032。满足基础提交门槛；与 N1VXbVbo 高度相关 (0.80)，需换信号簇
+  - 相关：N1VXbVbo(+0.80), 3qX8jGe6(+0.65), O0816Lr7(+0.62)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_epsr_low, 252) / close, 126), subindustry) - 0.5 * group_rank(ts_rank(ts_de...`
+- **P0gJ8qlM** (UNSUBMITTED, technical): Sharpe=1.99, Fitness=1.34, TO=0.1794, DD=0.0403。满足基础提交门槛；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimate_1qf_v4_nd_netprofit_mean, 252) / close, 126), subindustr...`
+- **GrOqxJL3** (UNSUBMITTED, other): Sharpe=1.7, Fitness=1.02, TO=0.1669, DD=0.034。指标一般，需继续优化；与 N1VXbVbo 高度相关 (0.74)，需换信号簇
+  - 相关：N1VXbVbo(+0.74), 3qX8jGe6(+0.55), rKe1mOzd(+0.53)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimate_1qf_v4_nd_ptp_mean, 252) / close, 126), subindustry) - 0...`
+- **blOYz9Kp** (UNSUBMITTED, other): Sharpe=2.3, Fitness=1.68, TO=0.183, DD=0.0405。满足基础提交门槛；与 3qX8jGe6 高度相关 (0.78)，需换信号簇
+  - 相关：3qX8jGe6(+0.78), N1VXbVbo(+0.77), rKe1mOzd(+0.70)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimate_1qf_v4_nd_netprofit_mean, 252) / close, 126), subindustr...`
+- **3qVMkKge** (UNSUBMITTED, technical): Sharpe=2.51, Fitness=2.05, TO=0.189, DD=0.0402。满足基础提交门槛；与 rKe1mOzd 高度相关 (0.76)，需换信号簇
+  - 相关：rKe1mOzd(+0.76), 3qX8jGe6(+0.67), 9qWzQLeK(+0.62)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimates_advanced_af_nd_netprofit_mean, 252) / close, 126), subi...`
+- **zqbv25Rd** (UNSUBMITTED, technical): Sharpe=1.91, Fitness=1.34, TO=0.1537, DD=0.0432。满足基础提交门槛；与 O0816Lr7 高度相关 (0.72)，需换信号簇
+  - 相关：O0816Lr7(+0.72), GrOqG8NG(+0.70), 2rm1ePwb(+0.63)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimate_1qf_v4_nd_netprofita_std, 252), 126), subindustry) - 0.5...`
+- **leKLENbn** (UNSUBMITTED, technical): Sharpe=2.27, Fitness=1.71, TO=0.1792, DD=0.0453。满足基础提交门槛；与 3qX8jGe6 高度相关 (0.77)，需换信号簇
+  - 相关：3qX8jGe6(+0.77), N1VXbVbo(+0.76), rKe1mOzd(+0.67)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_ptp_mean, 252) / close, 126), subindustry) - 0.5 * group_rank(ts_rank(ts_de...`
+- **88PmV7rz** (UNSUBMITTED, other): Sharpe=1.76, Fitness=1.23, TO=0.17, DD=0.0533。满足基础提交门槛；与 rKe1mOzd 高度相关 (0.73)，需换信号簇
+  - 相关：rKe1mOzd(+0.73), 3qX8jGe6(+0.66), N1VXbVbo(+0.66)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_ebit_high, 252) / close, 126), subindustry) - 0.5 * group_rank(ts_rank(ts_d...`
+
+---
+
+
+### 2026-09-29 18:40 UTC
+
+- **QPK1o3Ng** (ACTIVE, technical): Sharpe=2.19, Fitness=1.75, TO=0.1803, DD=0.0391。满足基础提交门槛；与 N1VXbVbo 中等相关 (0.70)，谨慎提交
+  - 相关：N1VXbVbo(+0.70), 3qX8jGe6(+0.62), rKe1mOzd(+0.50)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_actuals_advanced_af_nd_ptp_value, 252) / close, 126), subindustry) - 0.5...`
+- **88Pm2mwm** (UNSUBMITTED, technical): Sharpe=2.0, Fitness=1.41, TO=0.178, DD=0.0447。满足基础提交门槛；与 GrOqG8NG 高度相关 (0.79)，需换信号簇
+  - 相关：GrOqG8NG(+0.79), QPK1o3Ng(+0.69), N1VXbVbo(+0.63)
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_fs_detail_estimate_1qf_v4_nd_fcf_mean, 252) / close, 126), subindustry) - 0...`
+- **3qVMJedN** (UNSUBMITTED, technical): Sharpe=2.48, Fitness=1.95, TO=0.1742, DD=0.0347。满足基础提交门槛；暂无 ACTIVE alpha 可比相关
+  - 表达式：`0.5 * group_rank(ts_rank(ts_backfill(anl4_epsr_mean, 252) / close, 126), subindustry) - 0.5 * group_rank(ts_rank(ts_d...`
+
+---
+

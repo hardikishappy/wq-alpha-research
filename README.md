@@ -1,3 +1,11 @@
+# Autonomous WorldQuant BRAIN Quantitative Research Agent
+
+> **Proprietary Software — All Rights Reserved © 2026 Hardik.**  
+> This repository is published strictly for showcase and portfolio evaluation. Unauthorized execution, modification, replication, or distribution of this software is strictly prohibited under international copyright law.
+
+---
+
+
 # WQ Alpha Research Skill — 4 Days, Zero Human Intervention, From Zero to WorldQuant BRAIN Gold Medal 
 
 
